@@ -5,8 +5,8 @@ import ComposeApp
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
-    init {
-    KoinKt.initKoin()
+    override init() {
+        KoinKt.doInitKoin()
     }
 
     func application(

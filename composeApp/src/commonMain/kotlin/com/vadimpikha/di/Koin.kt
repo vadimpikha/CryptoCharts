@@ -22,9 +22,15 @@ private val AppModule = module {
     viewModel { CoinsListViewModel(get()) }
 }
 
-fun initKoin(extraDeclaration: KoinApplication.() -> Unit = {}) {
+fun initKoin(extraDeclaration: KoinApplication.() -> Unit) {
     startKoin {
         modules(AppModule)
         extraDeclaration()
+    }
+}
+
+fun initKoin() {
+    startKoin {
+        modules(AppModule)
     }
 }
