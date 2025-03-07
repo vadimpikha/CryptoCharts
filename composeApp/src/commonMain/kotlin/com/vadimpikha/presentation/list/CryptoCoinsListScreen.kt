@@ -1,5 +1,6 @@
 package com.vadimpikha.presentation.list
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -9,60 +10,102 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
-import com.vadimpikha.domain.model.LoadableResource
+import com.vadimpikha.domain.model.PendingResult
 import com.vadimpikha.domain.network.model.CoinInfo
+import com.vadimpikha.presentation.components.AppScrollbar
+import com.vadimpikha.presentation.list.models.UiEffect
+import com.vadimpikha.presentation.list.models.UiEvent
+import com.vadimpikha.presentation.list.models.UiState
+import com.vadimpikha.presentation.navigation.Destinations
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun CryptoCoinsListScreen() {
+fun CoinsListScreen(navController: NavController) {
 
-    val viewModel = koinViewModel<CryptoCoinsListViewModel>()
+    val viewModel = koinViewModel<CoinsListViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    CryptoCoinsListScreenContent(uiState)
+    CoinsListScreenContent(
+        uiState = uiState,
+        onEvent = viewModel::onEvent
+    )
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is UiEffect.OpenCoinDetailsScreen -> {
+                    navController.navigate(Destinations.CoinDetails(effect.id))
+                }
+            }
+        }
+    }
 }
 
 @Composable
-private fun CryptoCoinsListScreenContent(
-    uiState: UiState
+private fun CoinsListScreenContent(
+    uiState: UiState,
+    onEvent: (UiEvent) -> Unit
 ) {
     Surface {
         when (uiState.coinsInfo) {
-            is LoadableResource.Data -> CryptoCoinsList(uiState.coinsInfo.data)
-            is LoadableResource.Error -> ScreenLoadFailed(uiState.coinsInfo.throwable.toString())
-            LoadableResource.Loading -> ScreenLoader()
+            is PendingResult.Data -> CoinsList(uiState.coinsInfo.data, onEvent)
+            is PendingResult.Error -> LoadFailed(uiState.coinsInfo.throwable.toString())
+            PendingResult.Loading -> ScreenLoader()
         }
     }
 }
 
 @Composable
-private fun CryptoCoinsList(coinsInfo: List<CoinInfo>) {
-    LazyColumn {
-        items(coinsInfo, key = CoinInfo::id) { coinInfo ->
-            CoinInfoItem(
-                coinInfo = coinInfo,
-                modifier = Modifier.fillMaxWidth()
-            )
+private fun CoinsList(
+    coinsInfo: List<CoinInfo>,
+    onEvent: (UiEvent) -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        val listState = rememberLazyListState()
+
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(coinsInfo, key = CoinInfo::id) { coinInfo ->
+                CoinInfoItem(
+                    coinInfo = coinInfo,
+                    onEvent = onEvent,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
+
+        AppScrollbar(
+            lazyListState = listState,
+            modifier = Modifier.align(Alignment.CenterEnd)
+        )
     }
 }
 
 @Composable
-private fun ScreenLoadFailed(reason: String) {
+private fun LoadFailed(reason: String) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -83,11 +126,14 @@ private fun ScreenLoader() {
 
 @Composable
 private fun CoinInfoItem(
+    onEvent: (UiEvent) -> Unit,
     coinInfo: CoinInfo,
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.padding(16.dp),
+        modifier = modifier
+            .clickable { onEvent(UiEvent.OnCoinClicked(coinInfo.id)) }
+            .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

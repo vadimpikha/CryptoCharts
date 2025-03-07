@@ -56,6 +56,7 @@ kotlin {
             implementation(libs.coil)
             implementation(libs.coil.network.ktor)
             implementation(libs.multiplatformSettings)
+            implementation(libs.composeIcons.feather)
         }
 
         commonTest.dependencies {
@@ -71,6 +72,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.sqlDelight.driver.android)
+            implementation(libs.koin.android)
         }
 
         jvmMain.dependencies {
@@ -143,4 +145,11 @@ sqldelight {
             packageName.set("com.vadimpikha.db")
         }
     }
+}
+
+composeCompiler {
+    //for generating report build the project
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
+    metricsDestination = layout.buildDirectory.dir("compose_compiler")
+    stabilityConfigurationFiles = listOf(layout.projectDirectory.file("stability_config.conf"))
 }
