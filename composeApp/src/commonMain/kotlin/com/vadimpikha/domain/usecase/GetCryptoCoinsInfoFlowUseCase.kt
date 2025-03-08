@@ -13,7 +13,7 @@ class GetCryptoCoinsInfoFlowUseCase(
 ) {
 
     operator fun invoke(): Flow<PendingResult<List<CoinInfo>>> {
-        return flow { emit(cryptoInfoRepository.getCoinsInfo()) }
+        return cryptoInfoRepository.getCoinsInfoFlow(forceFetch = false)
             .mapToPendingResult()
     }
 

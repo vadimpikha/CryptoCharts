@@ -5,7 +5,7 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 
-internal class CoinGeckoDataSource(private val client: HttpClient) {
+internal class CoinGeckoApiService(private val client: HttpClient) {
 
     suspend fun getCoinsInfo(
         currency: String,

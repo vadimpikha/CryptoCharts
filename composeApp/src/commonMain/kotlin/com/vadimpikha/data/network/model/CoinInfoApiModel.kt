@@ -1,5 +1,6 @@
 package com.vadimpikha.data.network.model
 
+import com.vadimpikha.data.db.model.CoinInfoEntity
 import com.vadimpikha.domain.network.model.CoinInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -14,8 +15,8 @@ internal data class CoinInfoApiModel(
     @SerialName("price_change_percentage_24h") val priceChange: Double
 )
 
-internal fun CoinInfoApiModel.toDomain(): CoinInfo {
-    return CoinInfo(
+internal fun CoinInfoApiModel.toEntityModel(): CoinInfoEntity {
+    return CoinInfoEntity(
         id = id,
         symbol = symbol,
         name = name,
