@@ -1,5 +1,6 @@
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 plugins {
@@ -8,13 +9,15 @@ plugins {
     alias(libs.plugins.compose)
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlinx.serialization)
-    alias(libs.plugins.sqlDelight)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 kotlin {
     jvmToolchain(11)
     androidTarget {
         //https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-test.html
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
     }
 
@@ -55,8 +58,10 @@ kotlin {
             implementation(libs.koin.compose.viewmodel.navigation)
             implementation(libs.coil)
             implementation(libs.coil.network.ktor)
-            implementation(libs.multiplatformSettings)
             implementation(libs.composeIcons.feather)
+            implementation(libs.room.runtime)
+            implementation(libs.sqlite.bundled)
+            implementation(libs.dataStore.preferences)
         }
 
         commonTest.dependencies {
@@ -71,21 +76,19 @@ kotlin {
             implementation(libs.androidx.activityCompose)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
-            implementation(libs.sqlDelight.driver.android)
             implementation(libs.koin.android)
+            implementation(libs.room.runtime.android)
         }
 
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
-            implementation(libs.sqlDelight.driver.sqlite)
             implementation(libs.logback)
         }
 
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
-            implementation(libs.sqlDelight.driver.native)
         }
 
     }
@@ -105,13 +108,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    buildToolsVersion = "34.0.0"
 }
 
-//https://developer.android.com/develop/ui/compose/testing#setup
 dependencies {
     androidTestImplementation(libs.androidx.uitest.junit4)
     debugImplementation(libs.androidx.uitest.testManifest)
+    ksp(libs.room.compiler)
 }
 
 compose.desktop {
@@ -137,19 +139,13 @@ compose.desktop {
     }
 }
 
-sqldelight {
-    databases {
-        create("MyDatabase") {
-            // Database configuration here.
-            // https://cashapp.github.io/sqldelight
-            packageName.set("com.vadimpikha.db")
-        }
-    }
-}
-
 composeCompiler {
     //for generating report build the project
     reportsDestination = layout.buildDirectory.dir("compose_compiler")
     metricsDestination = layout.buildDirectory.dir("compose_compiler")
     stabilityConfigurationFiles = listOf(layout.projectDirectory.file("stability_config.conf"))
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }

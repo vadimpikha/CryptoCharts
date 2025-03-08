@@ -1,13 +1,8 @@
 import UIKit
-import ComposeApp
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
-
-    override init() {
-        KoinKt.doInitKoin()
-    }
 
     func application(
         _ application: UIApplication,

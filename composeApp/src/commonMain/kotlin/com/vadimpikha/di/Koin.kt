@@ -8,9 +8,9 @@ import com.vadimpikha.domain.usecase.GetCryptoCoinsInfoFlowUseCase
 import com.vadimpikha.domain.utils.DefaultDispatcherProvider
 import com.vadimpikha.domain.utils.DispatcherProvider
 import com.vadimpikha.presentation.list.CoinsListViewModel
-import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
 private val AppModule = module {
@@ -22,15 +22,9 @@ private val AppModule = module {
     viewModel { CoinsListViewModel(get()) }
 }
 
-fun initKoin(extraDeclaration: KoinApplication.() -> Unit) {
+fun initKoin(extraDeclaration: KoinAppDeclaration? = null) {
     startKoin {
         modules(AppModule)
-        extraDeclaration()
-    }
-}
-
-fun initKoin() {
-    startKoin {
-        modules(AppModule)
+        extraDeclaration?.invoke(this)
     }
 }
