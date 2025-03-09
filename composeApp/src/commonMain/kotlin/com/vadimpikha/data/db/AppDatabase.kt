@@ -7,7 +7,7 @@ import androidx.room.RoomDatabaseConstructor
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.vadimpikha.data.db.model.CoinInfoEntity
 
-@Database(entities = [CoinInfoEntity::class], version = 1)
+@Database(entities = [CoinInfoEntity::class], version = 2)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun coinsDao(): CoinsDao
@@ -17,6 +17,7 @@ abstract class AppDatabase : RoomDatabase() {
         fun create(builder: Builder<AppDatabase>): AppDatabase {
             return builder
                 .setDriver(BundledSQLiteDriver())
+                .fallbackToDestructiveMigration(true) //TODO::remove it after initial release
                 .build()
         }
     }

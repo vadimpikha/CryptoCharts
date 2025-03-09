@@ -6,5 +6,6 @@ data class CoinInfo(
     val name: String,
     val iconUrl: String,
     val currentPrice: Double,
-    val priceChange: Double
+    val priceChange: Double,
+    val marketCapRank: Int,
 )

@@ -19,19 +19,10 @@ data class CoinInfoEntity(
     @ColumnInfo(name = "current_price")
     val currentPrice: Double,
     @ColumnInfo(name = "price_change")
-    val priceChange: Double
+    val priceChange: Double,
+    @ColumnInfo(name = "market_cap_rank")
+    val marketCapRank: Int
 )
-
-fun CoinInfo.toEntityModel(): CoinInfoEntity {
-    return CoinInfoEntity(
-        id = id,
-        symbol = symbol,
-        name = name,
-        iconUrl = iconUrl,
-        currentPrice = currentPrice,
-        priceChange = priceChange
-    )
-}
 
 fun CoinInfoEntity.toDomainEntity(): CoinInfo {
     return CoinInfo(
@@ -40,6 +31,7 @@ fun CoinInfoEntity.toDomainEntity(): CoinInfo {
         name = name,
         iconUrl = iconUrl,
         currentPrice = currentPrice,
-        priceChange = priceChange
+        priceChange = priceChange,
+        marketCapRank = marketCapRank
     )
 }

@@ -7,12 +7,12 @@ import androidx.compose.ui.window.rememberWindowState
 import java.awt.Dimension
 import com.vadimpikha.App
 import com.vadimpikha.di.initKoin
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
 
 fun main() {
-
     System.setProperty("apple.awt.application.appearance", "system")
-
-    initKoin()
+    initComponents()
 
     application {
         Window(
@@ -24,6 +24,11 @@ fun main() {
             App()
         }
     }
+}
+
+private fun initComponents() {
+    Napier.base(DebugAntilog())
+    initKoin()
 }
 
 @Preview
