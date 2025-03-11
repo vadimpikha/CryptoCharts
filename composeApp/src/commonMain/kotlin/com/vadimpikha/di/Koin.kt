@@ -2,9 +2,11 @@ package com.vadimpikha.di
 
 import com.vadimpikha.data.db.AppDatabase
 import com.vadimpikha.data.network.CoinGeckoApiService
+import com.vadimpikha.data.prefs.PrefsManagerImpl
 import com.vadimpikha.data.network.CryptoInfoRepositoryImpl
 import com.vadimpikha.data.network.createHttpClient
 import com.vadimpikha.domain.network.CryptoInfoRepository
+import com.vadimpikha.domain.prefs.PrefsManager
 import com.vadimpikha.domain.usecase.GetCryptoCoinsInfoFlowUseCase
 import com.vadimpikha.domain.utils.DefaultDispatcherProvider
 import com.vadimpikha.domain.utils.DispatcherProvider
@@ -26,6 +28,7 @@ private val CommonModule = module {
     factoryOf(::GetCryptoCoinsInfoFlowUseCase)
     viewModelOf (::CoinsListViewModel)
     singleOf(AppDatabase::create)
+    singleOf(::PrefsManagerImpl).bind<PrefsManager>()
 }
 
 expect val PlatformModule: Module

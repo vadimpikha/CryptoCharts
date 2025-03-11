@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.vadimpikha.domain.network.model.CoinInfo
+import com.vadimpikha.presentation.utils.ceilToDecimals
 
 @Entity(tableName = "coins_info")
 data class CoinInfoEntity(
@@ -31,7 +32,7 @@ fun CoinInfoEntity.toDomainEntity(): CoinInfo {
         name = name,
         iconUrl = iconUrl,
         currentPrice = currentPrice,
-        priceChange = priceChange,
+        priceChange = priceChange.ceilToDecimals(1),
         marketCapRank = marketCapRank
     )
 }

@@ -2,6 +2,7 @@ package com.vadimpikha.presentation.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vadimpikha.domain.network.model.CoinsSorting
 import com.vadimpikha.domain.usecase.GetCryptoCoinsInfoFlowUseCase
 import com.vadimpikha.presentation.list.models.UiEffect
 import com.vadimpikha.presentation.list.models.UiEvent
@@ -10,8 +11,10 @@ import com.vadimpikha.presentation.utils.WhileSubscribedDefault
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -23,6 +26,7 @@ class CoinsListViewModel(
 ) : ViewModel() {
 
     private val loadListTriggerFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val coinsSorting = MutableStateFlow(CoinsSorting.ByMarketCapRank(descending = false))
 
     val uiState = createUiStateFlow()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribedDefault, UiState())
@@ -39,7 +43,8 @@ class CoinsListViewModel(
     private fun createUiStateFlow(): Flow<UiState> {
         return loadListTriggerFlow
             .onStart { emit(Unit) }
-            .flatMapLatest { getCryptoCoinsInfoFlowUseCase() }
+            .combine(coinsSorting) { _, sorting -> sorting }
+            .flatMapLatest { sorting -> getCryptoCoinsInfoFlowUseCase(sorting) }
             .map { UiState(it) }
     }
 }

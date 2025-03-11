@@ -62,8 +62,9 @@ kotlin {
             implementation(libs.composeIcons.feather)
             implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
-            implementation(libs.dataStore.preferences)
-            api(libs.napier)
+            implementation(libs.datastore.preferences)
+            implementation(libs.napier)
+            implementation(libs.kotlinx.datetime)
         }
 
         commonTest.dependencies {
@@ -115,12 +116,7 @@ android {
 dependencies {
     androidTestImplementation(libs.androidx.uitest.junit4)
     debugImplementation(libs.androidx.uitest.testManifest)
-    add("kspCommonMainMetadata", libs.room.compiler)
-    add("kspJvm", libs.room.compiler)
-    add("kspAndroid", libs.room.compiler)
-    add("kspIosX64", libs.room.compiler)
-    add("kspIosArm64", libs.room.compiler)
-    add("kspIosSimulatorArm64", libs.room.compiler)
+    projectKsp(libs.room.compiler)
 }
 
 compose.desktop {
@@ -155,4 +151,14 @@ composeCompiler {
 
 room {
     schemaDirectory("$projectDir/schemas")
+}
+
+
+fun DependencyHandler.projectKsp(dependencyNotation: Any) {
+    add("kspCommonMainMetadata", dependencyNotation)
+    add("kspJvm", dependencyNotation)
+    add("kspAndroid", dependencyNotation)
+    add("kspIosX64", dependencyNotation)
+    add("kspIosArm64", dependencyNotation)
+    add("kspIosSimulatorArm64", dependencyNotation)
 }

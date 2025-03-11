@@ -5,16 +5,20 @@ import com.vadimpikha.data.db.model.toDomainEntity
 import com.vadimpikha.data.network.model.toEntityModel
 import com.vadimpikha.domain.network.CryptoInfoRepository
 import com.vadimpikha.domain.network.model.CoinInfo
+import com.vadimpikha.domain.prefs.PrefsManager
+import com.vadimpikha.domain.prefs.model.CoinsSyncInfo
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Clock
 
 internal class CryptoInfoRepositoryImpl(
     private val coinGeckoApiService: CoinGeckoApiService,
-    private val appDatabase: AppDatabase
+    private val appDatabase: AppDatabase,
+    private val prefsManager: PrefsManager
 ) : CryptoInfoRepository {
 
     override fun getCoinsInfoFlow(forceFetch: Boolean): Flow<List<CoinInfo>> = flow {
@@ -27,13 +31,14 @@ internal class CryptoInfoRepositoryImpl(
             try {
                 val fetchedCoinsInfo = coinGeckoApiService.getCoinsInfo(
                     currency = "usd",
-                    order = "market_cap_desc",
-                    perPage = 100,
-                    page = 1,
-                    sparkline = false
                 )
-                appDatabase.coinsDao().insertCoinsInfo(fetchedCoinsInfo.map { it.toEntityModel() })
-
+                appDatabase.coinsDao().run {
+                    clearCoinsInfo()
+                    insertCoinsInfo(fetchedCoinsInfo.map { it.toEntityModel() })
+                }
+                prefsManager.updateCoinsSyncInfo(
+                    CoinsSyncInfo(timestamp = Clock.System.now())
+                )
             } catch (e: Exception) {
                 if (e is CancellationException || cachedCoinsInfo.isEmpty()) throw e
             }

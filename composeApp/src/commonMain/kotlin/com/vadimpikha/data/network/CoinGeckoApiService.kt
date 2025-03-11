@@ -9,16 +9,11 @@ internal class CoinGeckoApiService(private val client: HttpClient) {
 
     suspend fun getCoinsInfo(
         currency: String,
-        order: String,
-        perPage: Int,
-        page: Int,
-        sparkline: Boolean
     ): List<CoinInfoApiModel> = client.get(Urls.COINS_MARKETS) {
         parameter("vs_currency", currency)
-        parameter("order", order)
-        parameter("per_page", perPage)
-        parameter("page", page)
-        parameter("sparkline", sparkline)
+        parameter("precision", 2)
+        parameter("per_page", 100)
+        parameter("page", 1)
     }.body()
 
     private object Urls {

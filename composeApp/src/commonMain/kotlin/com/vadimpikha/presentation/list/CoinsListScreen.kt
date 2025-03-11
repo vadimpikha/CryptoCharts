@@ -3,6 +3,7 @@ package com.vadimpikha.presentation.list
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -16,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +26,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -132,10 +137,21 @@ private fun CoinInfoItem(
     coinInfo: CoinInfo,
     modifier: Modifier = Modifier
 ) {
+    val dividerColor = MaterialTheme.colorScheme.outlineVariant
     Row(
         modifier = modifier
             .clickable { onEvent(UiEvent.OnCoinClicked(coinInfo.id)) }
-            .padding(16.dp),
+            .padding(horizontal = 16.dp)
+            .drawBehind {
+                val thickness = 1.dp.toPx()
+                val y = size.height - thickness / 2
+                drawLine(
+                    color = dividerColor,
+                    start = Offset(0f, y),
+                    end = Offset(size.width, y)
+                )
+            }
+            .padding(vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -145,9 +161,28 @@ private fun CoinInfoItem(
             imageLoader = ImageLoader(LocalPlatformContext.current),
             modifier = Modifier
                 .clip(CircleShape)
-                .size(32.dp)
+                .size(48.dp)
         )
 
-        Text(text = coinInfo.name)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(text = coinInfo.name)
+            Text(text = coinInfo.symbol.uppercase())
+        }
+
+        Column(
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(text = "$${coinInfo.currentPrice}")
+            Text(
+                text = "${coinInfo.priceChange}%",
+                color = if(coinInfo.priceChange < 0) Color.Red else Color.Green
+            )
+        }
+
+
     }
 }
