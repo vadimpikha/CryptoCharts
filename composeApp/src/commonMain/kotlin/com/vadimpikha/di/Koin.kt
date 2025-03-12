@@ -7,9 +7,11 @@ import com.vadimpikha.data.network.CryptoInfoRepositoryImpl
 import com.vadimpikha.data.network.createHttpClient
 import com.vadimpikha.domain.network.CryptoInfoRepository
 import com.vadimpikha.domain.prefs.PrefsManager
-import com.vadimpikha.domain.usecase.GetCryptoCoinsInfoFlowUseCase
+import com.vadimpikha.domain.usecase.GetCoinsInfoFlowUseCase
+import com.vadimpikha.domain.usecase.GetCoinInfoUseCase
 import com.vadimpikha.domain.utils.DefaultDispatcherProvider
 import com.vadimpikha.domain.utils.DispatcherProvider
+import com.vadimpikha.presentation.details.CoinDetailsViewModel
 import com.vadimpikha.presentation.list.CoinsListViewModel
 import kotlinx.datetime.Clock
 import org.koin.core.context.startKoin
@@ -26,11 +28,13 @@ private val CommonModule = module {
     singleOf (::createHttpClient)
     factoryOf(::CoinGeckoApiService)
     singleOf(::CryptoInfoRepositoryImpl).bind<CryptoInfoRepository>()
-    factoryOf(::GetCryptoCoinsInfoFlowUseCase)
+    factoryOf(::GetCoinsInfoFlowUseCase)
+    factoryOf(::GetCoinInfoUseCase)
     viewModelOf (::CoinsListViewModel)
+    viewModelOf(::CoinDetailsViewModel)
     singleOf(AppDatabase::create)
     singleOf(::PrefsManagerImpl).bind<PrefsManager>()
-    single { Clock.System }
+    single { Clock.System }.bind<Clock>()
 }
 
 expect val PlatformModule: Module

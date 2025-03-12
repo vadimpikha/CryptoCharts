@@ -2,8 +2,9 @@ package com.vadimpikha.presentation.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vadimpikha.domain.model.mapToPendingResult
 import com.vadimpikha.domain.network.model.CoinsSorting
-import com.vadimpikha.domain.usecase.GetCryptoCoinsInfoFlowUseCase
+import com.vadimpikha.domain.usecase.GetCoinsInfoFlowUseCase
 import com.vadimpikha.presentation.list.models.UiEffect
 import com.vadimpikha.presentation.list.models.UiEvent
 import com.vadimpikha.presentation.list.models.UiState
@@ -22,7 +23,7 @@ import kotlinx.coroutines.flow.stateIn
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CoinsListViewModel(
-    private val getCryptoCoinsInfoFlowUseCase: GetCryptoCoinsInfoFlowUseCase
+    private val getCoinsInfoFlowUseCase: GetCoinsInfoFlowUseCase
 ) : ViewModel() {
 
     private val loadListTriggerFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
@@ -44,7 +45,8 @@ class CoinsListViewModel(
         return loadListTriggerFlow
             .onStart { emit(Unit) }
             .combine(coinsSorting) { _, sorting -> sorting }
-            .flatMapLatest { sorting -> getCryptoCoinsInfoFlowUseCase(sorting) }
+            .flatMapLatest { sorting -> getCoinsInfoFlowUseCase(sorting) }
+            .mapToPendingResult()
             .map { UiState(it) }
     }
 }

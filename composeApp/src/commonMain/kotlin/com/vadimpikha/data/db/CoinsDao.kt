@@ -15,6 +15,10 @@ interface CoinsDao {
 
     @Query("SELECT * FROM coins_info")
     fun getCoinsInfoFlow(): Flow<List<CoinInfoEntity>>
+
+    @Query("SELECT * FROM coins_info WHERE id=:id")
+    suspend fun getCoinInfo(id: String): CoinInfoEntity
+
     @Query("DELETE FROM coins_info")
     suspend fun clearCoinsInfo()
 }

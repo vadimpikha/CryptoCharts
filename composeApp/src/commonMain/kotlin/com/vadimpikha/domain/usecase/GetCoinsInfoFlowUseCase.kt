@@ -1,7 +1,5 @@
 package com.vadimpikha.domain.usecase
 
-import com.vadimpikha.domain.model.PendingResult
-import com.vadimpikha.domain.model.mapToPendingResult
 import com.vadimpikha.domain.network.CryptoInfoRepository
 import com.vadimpikha.domain.network.model.CoinInfo
 import com.vadimpikha.domain.network.model.CoinsSorting
@@ -12,13 +10,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.daysUntil
 import kotlinx.datetime.until
 
-class GetCryptoCoinsInfoFlowUseCase(
+class GetCoinsInfoFlowUseCase(
     private val cryptoInfoRepository: CryptoInfoRepository,
     private val prefsManager: PrefsManager,
     private val clock: Clock
@@ -26,11 +20,9 @@ class GetCryptoCoinsInfoFlowUseCase(
 
     operator fun invoke(
         sorting: CoinsSorting = CoinsSorting.Default
-    ): Flow<PendingResult<List<CoinInfo>>> = flow {
+    ): Flow<List<CoinInfo>> = flow {
         val innerFlow = cryptoInfoRepository.getCoinsInfoFlow(forceFetch = shouldForceSync())
             .map { it.sortedWith(sorting.getComparator()) }
-            .mapToPendingResult()
-
         emitAll(innerFlow)
     }
 

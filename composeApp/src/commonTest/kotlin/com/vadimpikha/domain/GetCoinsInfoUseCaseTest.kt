@@ -6,7 +6,7 @@ import com.vadimpikha.domain.network.model.CoinInfo
 import com.vadimpikha.domain.network.model.CoinsSorting
 import com.vadimpikha.domain.prefs.PrefsManager
 import com.vadimpikha.domain.prefs.model.CoinsSyncInfo
-import com.vadimpikha.domain.usecase.GetCryptoCoinsInfoFlowUseCase
+import com.vadimpikha.domain.usecase.GetCoinsInfoFlowUseCase
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentiallyReturns
 import dev.mokkery.every
@@ -52,7 +52,7 @@ class GetCoinsInfoUseCaseTest {
         everySuspend { getCoinsSyncInfo() } sequentiallyReturns (testCoinsSyncInfo)
     }
 
-    private val useCase = GetCryptoCoinsInfoFlowUseCase(repository, prefsManager, clock)
+    private val useCase = GetCoinsInfoFlowUseCase(repository, prefsManager, clock)
 
     @Test
     fun testForceRefreshFlag() = runTest {
@@ -75,9 +75,9 @@ class GetCoinsInfoUseCaseTest {
             CoinsSorting.ByPrice(descending = false),
         )
 
-        val coins1 = useCase(sortingVariants[0]).waitData()
-        val coins2 = useCase(sortingVariants[1]).waitData()
-        val coins3 = useCase(sortingVariants[2]).waitData()
+        val coins1 = useCase(sortingVariants[0]).first()
+        val coins2 = useCase(sortingVariants[1]).first()
+        val coins3 = useCase(sortingVariants[2]).first()
         val expectedRanksSortingIds = listOf("btc", "eth", "sol")
         val expectedPriceChangeSortingIds = listOf("eth", "btc", "sol")
         val expectedPriceSortingIds = listOf("sol", "eth", "btc")

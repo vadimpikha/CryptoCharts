@@ -7,4 +7,6 @@ interface CryptoInfoRepository {
 
     fun getCoinsInfoFlow(forceFetch: Boolean): Flow<List<CoinInfo>>
 
+    suspend fun getCoinInfo(id: String): CoinInfo
+
 }

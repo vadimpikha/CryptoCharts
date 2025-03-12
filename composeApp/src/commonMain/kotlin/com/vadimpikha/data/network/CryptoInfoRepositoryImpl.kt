@@ -50,4 +50,6 @@ internal class CryptoInfoRepositoryImpl(
         )
     }
 
+    override suspend fun getCoinInfo(id: String): CoinInfo =
+        appDatabase.coinsDao().getCoinInfo(id).toDomainEntity()
 }
