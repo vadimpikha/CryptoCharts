@@ -26,7 +26,7 @@ class CoinsListViewModel(
 ) : ViewModel() {
 
     private val loadListTriggerFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-    private val coinsSorting = MutableStateFlow(CoinsSorting.ByMarketCapRank(descending = false))
+    private val coinsSorting = MutableStateFlow(CoinsSorting.Default)
 
     val uiState = createUiStateFlow()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribedDefault, UiState())

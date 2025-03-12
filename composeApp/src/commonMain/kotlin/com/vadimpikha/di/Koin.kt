@@ -11,6 +11,7 @@ import com.vadimpikha.domain.usecase.GetCryptoCoinsInfoFlowUseCase
 import com.vadimpikha.domain.utils.DefaultDispatcherProvider
 import com.vadimpikha.domain.utils.DispatcherProvider
 import com.vadimpikha.presentation.list.CoinsListViewModel
+import kotlinx.datetime.Clock
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.factoryOf
@@ -29,6 +30,7 @@ private val CommonModule = module {
     viewModelOf (::CoinsListViewModel)
     singleOf(AppDatabase::create)
     singleOf(::PrefsManagerImpl).bind<PrefsManager>()
+    single { Clock.System }
 }
 
 expect val PlatformModule: Module

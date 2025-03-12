@@ -37,7 +37,7 @@ fun <T> Flow<T>.mapToPendingResult(): Flow<PendingResult<T>> {
 }
 
 suspend fun <T> Flow<PendingResult<T>>.waitData(): T {
-    return filterIsInstance<PendingResult.Data<T>>().first().data
+    return waitResult().getOrThrow()
 }
 
 suspend fun <T> Flow<PendingResult<T>>.waitResult(): Result<T> {

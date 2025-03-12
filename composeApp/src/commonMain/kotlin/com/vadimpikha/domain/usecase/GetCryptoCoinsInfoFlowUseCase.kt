@@ -20,10 +20,13 @@ import kotlinx.datetime.until
 
 class GetCryptoCoinsInfoFlowUseCase(
     private val cryptoInfoRepository: CryptoInfoRepository,
-    private val prefsManager: PrefsManager
+    private val prefsManager: PrefsManager,
+    private val clock: Clock
 ) {
 
-    operator fun invoke(sorting: CoinsSorting): Flow<PendingResult<List<CoinInfo>>> = flow {
+    operator fun invoke(
+        sorting: CoinsSorting = CoinsSorting.Default
+    ): Flow<PendingResult<List<CoinInfo>>> = flow {
         val innerFlow = cryptoInfoRepository.getCoinsInfoFlow(forceFetch = shouldForceSync())
             .map { it.sortedWith(sorting.getComparator()) }
             .mapToPendingResult()
@@ -34,7 +37,7 @@ class GetCryptoCoinsInfoFlowUseCase(
 
     private suspend fun shouldForceSync(): Boolean {
         val syncInfo = prefsManager.getCoinsSyncInfo() ?: return true
-        val minutesSinceSync = syncInfo.timestamp.until(Clock.System.now(), DateTimeUnit.MINUTE)
+        val minutesSinceSync = syncInfo.timestamp.until(clock.now(), DateTimeUnit.MINUTE)
         return minutesSinceSync >= COINS_SYNC_PERIOD_MINUTES
     }
 

@@ -18,4 +18,8 @@ sealed class CoinsSorting(
     ) : CoinsSorting(CoinInfo::currentPrice)
 
     fun getComparator() = if (descending) compareByDescending(selector) else compareBy(selector)
+
+    companion object {
+        val Default = ByMarketCapRank(descending = false)
+    }
 }
