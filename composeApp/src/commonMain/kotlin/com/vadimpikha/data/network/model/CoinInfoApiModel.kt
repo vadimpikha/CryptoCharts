@@ -1,8 +1,6 @@
 package com.vadimpikha.data.network.model
 
-import androidx.room.ColumnInfo
 import com.vadimpikha.data.db.model.CoinInfoEntity
-import com.vadimpikha.domain.network.model.CoinInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -14,7 +12,8 @@ internal data class CoinInfoApiModel(
     @SerialName("image") val iconUrl: String,
     @SerialName("current_price") val currentPrice: Double,
     @SerialName("price_change_percentage_24h") val priceChange: Double,
-    @SerialName("market_cap_rank") val marketCapRank: Int
+    @SerialName("market_cap_rank") val marketCapRank: Int,
+    @SerialName("market_cap") val marketCap: Long,
 )
 
 internal fun CoinInfoApiModel.toEntityModel(): CoinInfoEntity {
@@ -25,6 +24,7 @@ internal fun CoinInfoApiModel.toEntityModel(): CoinInfoEntity {
         iconUrl = iconUrl,
         currentPrice = currentPrice,
         priceChange = priceChange,
-        marketCapRank = marketCapRank
+        marketCapRank = marketCapRank,
+        marketCap = marketCap
     )
 }

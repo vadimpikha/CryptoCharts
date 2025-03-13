@@ -1,20 +1,19 @@
 package com.vadimpikha.presentation.details
 
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,18 +24,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
+import coil3.request.ImageRequest
 import com.vadimpikha.LocalSharedTransitionScope
 import com.vadimpikha.domain.model.PendingResult
 import com.vadimpikha.domain.model.getOrNull
 import com.vadimpikha.domain.network.model.CoinInfo
 import com.vadimpikha.presentation.components.ScreenLoader
+import com.vadimpikha.presentation.components.Toolbar
+import com.vadimpikha.presentation.components.ToolbarDefaults
 import com.vadimpikha.presentation.navigation.LocalScreenAnimatedContentScope
 import com.vadimpikha.presentation.utils.currentOrThrow
-import compose.icons.FeatherIcons
-import compose.icons.feathericons.ArrowLeft
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -56,6 +55,7 @@ fun CoinDetailsScreen(
     )
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun CoinDetailsScreenContent(
     coinId: String,
@@ -70,9 +70,19 @@ private fun CoinDetailsScreenContent(
         ) {
 
             Toolbar(
-                coinId = coinId,
-                info = infoPendingResult.getOrNull(),
-                onNavigateUp = onNavigateUp,
+                startSlot = { ToolbarDefaults.NavigateUpButton(onNavigateUp) },
+                centerSlot = {
+                    val info = infoPendingResult.getOrNull()
+                    with(LocalSharedTransitionScope.currentOrThrow()) {
+                        ToolbarTitle(
+                            coinId = coinId,
+                            info = info,
+                            animatedVisibilityScope = LocalScreenAnimatedContentScope.currentOrThrow(),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                },
+                endSlot = { Spacer(Modifier.width(56.dp)) },
                 modifier = Modifier.align(Alignment.TopCenter)
             )
 
@@ -85,64 +95,45 @@ private fun CoinDetailsScreenContent(
     }
 }
 
+
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun Toolbar(
+private fun SharedTransitionScope.ToolbarTitle(
     coinId: String,
     info: CoinInfo?,
-    onNavigateUp: () -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier
 ) {
-    Box(
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
-        Row(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxWidth()
-        ) {
-            IconButton(
-                onClick = onNavigateUp,
-                modifier = Modifier.padding(4.dp)
-            ) {
-                Icon(
-                    imageVector = FeatherIcons.ArrowLeft,
-                    contentDescription = "Back"
-                )
-            }
-        }
+        val imageKey = "image-$coinId"
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.CenterVertically,
+        AsyncImage(
+            model = ImageRequest.Builder(LocalPlatformContext.current)
+                .data(info?.iconUrl)
+                .placeholderMemoryCacheKey(imageKey)
+                .memoryCacheKey(imageKey)
+                .build(),
+            contentDescription = null,
             modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxWidth()
-        ) {
-            with(LocalSharedTransitionScope.currentOrThrow()) {
-                AsyncImage(
-                    model = info?.iconUrl,
-                    contentDescription = null,
-                    imageLoader = ImageLoader(LocalPlatformContext.current),
-                    modifier = Modifier
-                        .sharedElement(
-                            state = rememberSharedContentState(key = "image-$coinId"),
-                            animatedVisibilityScope = LocalScreenAnimatedContentScope.currentOrThrow()
-                        )
-                        .clip(CircleShape)
-                        .size(28.dp)
+                .sharedElement(
+                    state = rememberSharedContentState(imageKey),
+                    animatedVisibilityScope = animatedVisibilityScope
                 )
+                .clip(CircleShape)
+                .size(28.dp)
+        )
 
-                Text(
-                    text = info?.symbol?.uppercase().orEmpty(),
-                    modifier = Modifier
-                        .sharedElement(
-                            state = rememberSharedContentState(key = "symbol-$coinId"),
-                            animatedVisibilityScope = LocalScreenAnimatedContentScope.currentOrThrow()
-                        )
-                        .widthIn(min = 48.dp)
+        Text(
+            text = info?.symbol?.uppercase().orEmpty(),
+            modifier = Modifier
+                .sharedElement(
+                    state = rememberSharedContentState(key = "symbol-$coinId"),
+                    animatedVisibilityScope = animatedVisibilityScope
                 )
-            }
-        }
+        )
     }
 }

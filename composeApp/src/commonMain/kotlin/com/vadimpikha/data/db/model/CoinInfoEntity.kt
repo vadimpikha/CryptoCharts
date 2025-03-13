@@ -22,7 +22,9 @@ data class CoinInfoEntity(
     @ColumnInfo(name = "price_change")
     val priceChange: Double,
     @ColumnInfo(name = "market_cap_rank")
-    val marketCapRank: Int
+    val marketCapRank: Int,
+    @ColumnInfo(name = "market_cap")
+    val marketCap: Long
 )
 
 fun CoinInfoEntity.toDomainEntity(): CoinInfo {
@@ -33,6 +35,7 @@ fun CoinInfoEntity.toDomainEntity(): CoinInfo {
         iconUrl = iconUrl,
         currentPrice = currentPrice,
         priceChange = priceChange.floorToDecimals(1),
-        marketCapRank = marketCapRank
+        marketCapRank = marketCapRank,
+        marketCap = marketCap
     )
 }

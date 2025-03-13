@@ -2,13 +2,10 @@ package com.vadimpikha.data.prefs
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import net.harawata.appdirs.AppDirsFactory
-import java.io.File
+import com.vadimpikha.utils.getAppFilesDirectory
 
 fun createDataStore(): DataStore<Preferences> = createDataStoreAtPath(
     producePath = {
-        val appDirs = AppDirsFactory.getInstance()
-        val userDataDir = appDirs.getUserDataDir("CryptoCharts", null, null)
-        File(userDataDir, dataStoreFileName).absolutePath
+        getAppFilesDirectory().resolve(dataStoreFileName).absolutePath
     }
 )

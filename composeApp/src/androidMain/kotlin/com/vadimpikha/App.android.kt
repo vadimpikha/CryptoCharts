@@ -7,7 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import coil3.SingletonImageLoader
 import com.vadimpikha.di.initKoin
+import com.vadimpikha.presentation.coil.createImageLoader
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import org.koin.android.ext.koin.androidContext
@@ -25,6 +27,7 @@ class AndroidApp: Application() {
         initKoin {
             androidContext(this@AndroidApp)
         }
+        SingletonImageLoader.setSafe { createImageLoader(this) }
     }
 }
 

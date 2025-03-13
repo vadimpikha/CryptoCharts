@@ -8,4 +8,5 @@ data class CoinInfo(
     val currentPrice: Double,
     val priceChange: Double,
     val marketCapRank: Int,
+    val marketCap: Long,
 )

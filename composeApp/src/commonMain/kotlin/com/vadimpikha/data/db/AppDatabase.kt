@@ -7,7 +7,7 @@ import androidx.room.RoomDatabaseConstructor
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.vadimpikha.data.db.model.CoinInfoEntity
 
-@Database(entities = [CoinInfoEntity::class], version = 2)
+@Database(entities = [CoinInfoEntity::class], version = 3)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun coinsDao(): CoinsDao
